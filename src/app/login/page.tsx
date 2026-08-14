@@ -6,18 +6,32 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<"" | "google" | "email">("");
 
-  async function submit(e: React.FormEvent) {
+  async function loginGoogle() {
+    setLoading("google");
+    setErr(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (error) {
+      setErr(error.message);
+      setLoading("");
+    }
+  }
+
+  async function loginEmail(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
+    setLoading("email");
     setErr(null);
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
-    setLoading(false);
+    setLoading("");
     if (error) setErr(error.message);
     else setSent(true);
   }
@@ -26,29 +40,53 @@ export default function LoginPage() {
     <main className="min-h-dvh flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-5">
         <h1 className="text-2xl font-semibold text-center">Zaloguj się</h1>
+
         {sent ? (
           <p className="text-center text-zinc-600">
             Sprawdź skrzynkę <b>{email}</b> — wysłaliśmy link do logowania.
           </p>
         ) : (
-          <form onSubmit={submit} className="space-y-3">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ty@example.com"
-              className="w-full px-4 py-3 rounded-lg border border-zinc-300 bg-white"
-            />
+          <>
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-lg bg-sky-500 text-white font-medium disabled:opacity-50"
+              onClick={loginGoogle}
+              disabled={!!loading}
+              className="w-full py-3 rounded-lg border border-zinc-300 bg-white text-zinc-900 font-medium inline-flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {loading ? "Wysyłanie…" : "Wyślij magic link"}
+              <svg width="18" height="18" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              {loading === "google" ? "Łączenie…" : "Zaloguj przez Google"}
             </button>
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-zinc-200" />
+              <span className="text-xs text-zinc-500">albo</span>
+              <div className="flex-1 h-px bg-zinc-200" />
+            </div>
+
+            <form onSubmit={loginEmail} className="space-y-3">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ty@example.com"
+                className="w-full px-4 py-3 rounded-lg border border-zinc-300 bg-white"
+              />
+              <button
+                type="submit"
+                disabled={!!loading}
+                className="w-full py-3 rounded-lg bg-sky-500 text-white font-medium disabled:opacity-50"
+              >
+                {loading === "email" ? "Wysyłanie…" : "Wyślij magic link"}
+              </button>
+            </form>
+
             {err && <p className="text-sm text-red-600">{err}</p>}
-          </form>
+          </>
         )}
       </div>
     </main>
