@@ -11,4 +11,4 @@ export function getGroq(): Groq {
   return _groq;
 }
 
-export const MODEL = "llama-3.3-70b-versatile";
+export const MODEL = "llama-3.1-8b-instant";
