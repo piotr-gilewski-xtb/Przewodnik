@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type Groq from "groq-sdk";
 import { createClient } from "@/lib/supabase/server";
-import { groq, MODEL } from "@/lib/ai/client";
+import { getGroq, MODEL } from "@/lib/ai/client";
 import { searchPlaces } from "@/lib/osm/places";
 import { mapsUrl } from "@/lib/utils";
 
@@ -60,7 +60,7 @@ Odpowiadaj zwięźle po polsku.`;
   ];
 
   for (let step = 0; step < 8; step++) {
-    const res = await groq.chat.completions.create({
+    const res = await getGroq().chat.completions.create({
       model: MODEL, messages: conv, tools, tool_choice: "auto", temperature: 0.5,
     });
     const msg = res.choices[0].message;

@@ -1,5 +1,5 @@
 import type Groq from "groq-sdk";
-import { groq, MODEL } from "./client";
+import { getGroq, MODEL } from "./client";
 import { searchPlaces } from "@/lib/osm/places";
 import { eachDate, mapsUrl } from "@/lib/utils";
 import type { Preferences } from "@/lib/types";
@@ -104,7 +104,7 @@ Zasady:
   ];
 
   for (let step = 0; step < 12; step++) {
-    const res = await groq.chat.completions.create({
+    const res = await getGroq().chat.completions.create({
       model: MODEL,
       messages,
       tools,
