@@ -11,6 +11,10 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "packageManager": "pnpm@11.21.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["unrs-resolver", "@tailwindcss/oxide", "sharp"]
+  },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
