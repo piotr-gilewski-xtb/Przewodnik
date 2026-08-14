@@ -1,0 +1,8 @@
+{
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/trips/generate/route.ts": { "maxDuration": 60 },
+    "src/app/api/trips/[id]/regenerate/route.ts": { "maxDuration": 60 },
+    "src/app/api/agent/chat/route.ts": { "maxDuration": 60 }
+  }
+}
