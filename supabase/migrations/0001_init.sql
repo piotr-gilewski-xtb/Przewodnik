@@ -20,13 +20,17 @@ create table if not exists public.trips (
 );
 
 create table if not exists public.trip_collaborators (
+  id uuid primary key default gen_random_uuid(),
   trip_id uuid not null references public.trips(id) on delete cascade,
   user_id uuid references auth.users(id) on delete cascade,
   invited_email text,
   role text not null default 'editor',
-  created_at timestamptz default now(),
-  primary key (trip_id, coalesce(user_id::text, invited_email))
+  created_at timestamptz default now()
 );
+create unique index if not exists trip_collab_user_uniq
+  on public.trip_collaborators (trip_id, user_id) where user_id is not null;
+create unique index if not exists trip_collab_email_uniq
+  on public.trip_collaborators (trip_id, invited_email) where invited_email is not null;
 
 create table if not exists public.plan_days (
   id uuid primary key default gen_random_uuid(),
